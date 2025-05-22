@@ -12,7 +12,6 @@ TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打
 | 查詢委託簿深度          | 從 I080 顯示五檔買賣價格與數量                |
 | 條件查詢                | 可依商品代碼、時間區間查詢特定資料            |
 | 輸出報表                | 匯出查詢結果為 JSON / CSV，供系統後續分析     |
-
 ---
 
 ## 🧾 資料表
@@ -46,6 +45,14 @@ TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打
 | bidVolume[5]   | int[]        | 五檔買量       |
 | askPrice[5]    | double[]     | 五檔賣價       |
 | askVolume[5]   | int[]        | 五檔賣量       |
+
+### 4. `ProductInfo`（商品基本資訊：I010）
+
+| 欄位名稱        | 型態     | 說明         |
+|-----------------|----------|--------------|
+| productId       | string   | 商品代碼     |
+| productName     | string   | 商品名稱     |
+| deliveryMonth   | string   | 交割月份     |
 
 ---
 
