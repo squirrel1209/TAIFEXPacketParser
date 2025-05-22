@@ -18,6 +18,7 @@ partition Header解析 {
 
 partition 分發至對應Parser {
   :PacketDispatcher 根據 formatCode\n選擇對應 Parser;
+
   if (formatCode == I020?) then (yes)
     :I020Parser 開始解析;
     :產出 MatchInfo 結構;
@@ -25,8 +26,18 @@ partition 分發至對應Parser {
     if (formatCode == I012?) then (yes)
       :I012Parser 開始解析;
       :產出 PriceBandInfo 結構;
-    else (其他格式)
-      :使用對應解析器;
+    else (no)
+      if (formatCode == I080?) then (yes)
+        :I080Parser 開始解析;
+        :產出 OrderBookInfo 結構;
+      else (no)
+        if (formatCode == I010?) then (yes)
+          :I010Parser 開始解析;
+          :產出 ProductInfo 結構;
+        else
+          :使用對應解析器;
+        endif
+      endif
     endif
   endif
 }
