@@ -1,0 +1,91 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam classAttributeIconSize 0
+skinparam dpi 150
+skinparam defaultFontName "Noto Sans CJK TC"
+
+package "parser" #DDFFDD {
+  class I020Parser
+  class I012Parser
+  class I080Parser
+}
+
+package "data" #FFF2CC {
+  class MatchInfo
+  class ProductInfo
+  class PriceBandInfo
+  class OrderBookInfo
+  class I020Packet
+}
+
+package "base" #FFEEEE {
+  class ParsedResultBase
+  class TAIFEXParserInterface
+}
+
+package "controller" #D5E8D4 {
+  class TAIFEXPacketParser
+  class HeaderParser
+}
+
+package "dispatcher" #E1D5E7 {
+  class PacketDispatcher
+}
+
+package "common" #E6E6FA {
+  class TBCD
+  class FixedArray
+  class FixedString
+  class EncodingUtils
+}
+
+package "storage" #F8CECC {
+  class TAIFEXMemoryDatabase
+}
+
+package "output" #DAE8FC {
+  class OutputFormatter
+}
+
+package "query" #F5F5F5 {
+  class DataQuery
+}
+
+package "state" #FFE6CC {
+  class StateUpdater
+}
+
+' 繼承與實作
+I020Parser --|> TAIFEXParserInterface
+I012Parser --|> TAIFEXParserInterface
+I080Parser --|> TAIFEXParserInterface
+
+' 控制流程
+TAIFEXPacketParser --> HeaderParser
+TAIFEXPacketParser --> PacketDispatcher
+PacketDispatcher --> I020Parser
+PacketDispatcher --> I012Parser
+PacketDispatcher --> I080Parser
+
+' 資料流
+I020Parser --> MatchInfo
+I012Parser --> PriceBandInfo
+I080Parser --> OrderBookInfo
+I020Packet --> MatchInfo
+TAIFEXPacketParser --> TAIFEXMemoryDatabase
+TAIFEXMemoryDatabase --> MatchInfo
+
+' 工具類使用
+MatchInfo --> FixedArray
+MatchInfo --> FixedString
+MatchInfo --> TBCD
+MatchInfo --> EncodingUtils
+
+' 查詢與輸出
+TAIFEXMemoryDatabase --> DataQuery
+DataQuery --> OutputFormatter
+DataQuery --> StateUpdater
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+skinparam defaultTextAlignment center
+skinparam dpi 150
+skinparam shadowing false
+skinparam linetype ortho
+
+title TAIFEXPacketProject 資料處理流程圖
+
+start
+
+:讀取封包資料 (binary file)\ndata/sample.bin;
+:TAIFEXPacketParser 啟動解析流程;
+
+partition Header解析 {
+  :HeaderParser 解析共通欄位;
+  :取得 formatCode, length, time 等資訊;
+}
+
+partition 分發至對應Parser {
+  :PacketDispatcher 根據 formatCode\n選擇對應 Parser;
+  if (formatCode == I020?) then (yes)
+    :I020Parser 開始解析;
+    :產出 MatchInfo 結構;
+  else (no)
+    if (formatCode == I012?) then (yes)
+      :I012Parser 開始解析;
+      :產出 PriceBandInfo 結構;
+    else (其他格式)
+      :使用對應解析器;
+    endif
+  endif
+}
+
+:封裝為資料結構\n如 I020Packet;
+
+:存入 TAIFEXMemoryDatabase;
+
+partition 後處理 {
+  :DataQuery 查詢處理;
+  :OutputFormatter 輸出為 JSON / CSV;
+  :StateUpdater 更新即時撮合狀態;
+}
+
+stop
+
+@enduml

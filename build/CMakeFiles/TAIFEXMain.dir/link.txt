@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\TAIFEXMain.dir/objects.a
+D:\winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64ucrt-9.0.0-r5\mingw64\bin\ar.exe qc CMakeFiles\TAIFEXMain.dir/objects.a @CMakeFiles\TAIFEXMain.dir\objects1.rsp
+D:\winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64ucrt-9.0.0-r5\mingw64\bin\c++.exe -Wl,--whole-archive CMakeFiles\TAIFEXMain.dir/objects.a -Wl,--no-whole-archive -o TAIFEXMain.exe -Wl,--out-implib,libTAIFEXMain.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\TAIFEXMain.dir\linkLibs.rsp
