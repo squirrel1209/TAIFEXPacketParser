@@ -1,18 +1,34 @@
 @startuml
-skinparam packageStyle rectangle
+skinparam dpi 150
 skinparam shadowing false
 skinparam defaultTextAlignment center
 skinparam classAttributeIconSize 0
-skinparam dpi 150
+skinparam linetype ortho
+skinparam roundCorner 15
+skinparam packageStyle rectangle
 skinparam defaultFontName "Noto Sans CJK TC"
 
-package "parser" #DDFFDD {
+package "controller 🎮" #D5E8D4 {
+  class TAIFEXPacketParser
+  class HeaderParser
+}
+
+package "dispatcher 📨" #E1D5E7 {
+  class PacketDispatcher
+}
+
+package "parser 🧩" #DDFFDD {
   class I020Parser
   class I012Parser
   class I080Parser
 }
 
-package "data" #FFF2CC {
+package "base 🌱" #FFEEEE {
+  class ParsedResultBase
+  class TAIFEXParserInterface
+}
+
+package "data 📊" #FFF2CC {
   class MatchInfo
   class ProductInfo
   class PriceBandInfo
@@ -20,72 +36,64 @@ package "data" #FFF2CC {
   class I020Packet
 }
 
-package "base" #FFEEEE {
-  class ParsedResultBase
-  class TAIFEXParserInterface
-}
-
-package "controller" #D5E8D4 {
-  class TAIFEXPacketParser
-  class HeaderParser
-}
-
-package "dispatcher" #E1D5E7 {
-  class PacketDispatcher
-}
-
-package "common" #E6E6FA {
+package "common 🔧" #E6E6FA {
   class TBCD
   class FixedArray
   class FixedString
   class EncodingUtils
 }
 
-package "storage" #F8CECC {
+package "storage 💾" #F8CECC {
   class TAIFEXMemoryDatabase
 }
 
-package "output" #DAE8FC {
+package "output 🖨️" #DAE8FC {
   class OutputFormatter
 }
 
-package "query" #F5F5F5 {
+package "query 🔍" #F5F5F5 {
   class DataQuery
 }
 
-package "state" #FFE6CC {
+package "state 🔁" #FFE6CC {
   class StateUpdater
 }
 
+' ======================
 ' 繼承與實作
 I020Parser --|> TAIFEXParserInterface
 I012Parser --|> TAIFEXParserInterface
 I080Parser --|> TAIFEXParserInterface
 
+' ======================
 ' 控制流程
-TAIFEXPacketParser --> HeaderParser
-TAIFEXPacketParser --> PacketDispatcher
-PacketDispatcher --> I020Parser
-PacketDispatcher --> I012Parser
-PacketDispatcher --> I080Parser
+TAIFEXPacketParser -down-> HeaderParser
+TAIFEXPacketParser -down-> PacketDispatcher
+PacketDispatcher -down-> I020Parser
+PacketDispatcher -down-> I012Parser
+PacketDispatcher -down-> I080Parser
 
+' ======================
 ' 資料流
-I020Parser --> MatchInfo
-I012Parser --> PriceBandInfo
-I080Parser --> OrderBookInfo
-I020Packet --> MatchInfo
-TAIFEXPacketParser --> TAIFEXMemoryDatabase
-TAIFEXMemoryDatabase --> MatchInfo
+I020Parser -down-> MatchInfo
+I012Parser -down-> PriceBandInfo
+I080Parser -down-> OrderBookInfo
+I020Packet -down-> MatchInfo
 
-' 工具類使用
-MatchInfo --> FixedArray
-MatchInfo --> FixedString
-MatchInfo --> TBCD
-MatchInfo --> EncodingUtils
+TAIFEXPacketParser -right-> TAIFEXMemoryDatabase
+TAIFEXMemoryDatabase -down-> MatchInfo
 
+' ======================
+' 工具使用
+MatchInfo -right-> FixedArray
+MatchInfo -right-> FixedString
+MatchInfo -right-> TBCD
+MatchInfo -right-> EncodingUtils
+
+' ======================
 ' 查詢與輸出
-TAIFEXMemoryDatabase --> DataQuery
-DataQuery --> OutputFormatter
-DataQuery --> StateUpdater
+TAIFEXMemoryDatabase -down-> DataQuery
+DataQuery -down-> OutputFormatter
+DataQuery -right-> StateUpdater
 
 @enduml
