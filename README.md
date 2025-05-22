@@ -1,7 +1,17 @@
 # 🧠 TAIFEXPacketProject
 
 TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打造的高效能封包解析系統。專案具有模組化結構，支援多格式（如 I020、I012、I080）解析、記憶體內資料庫管理、以及可擴展的查詢與輸出介面，適合用於市場資料監控、交易系統前處理等應用場景。
-
+---
+⚙️ 功能項目總覽
+功能名稱	            說明
+封包格式自動識別	    根據封包 Header 解析格式代碼（如 I020、I012）
+各格式封包解析支援	    支援多種期交所封包格式（I020、I012、I080 等）
+即時資料解析	        可應用於 socket 串流資料（設計預留）
+記憶體資料儲存	        使用 TAIFEXMemoryDatabase 儲存解析結果
+查詢功能	            提供商品代碼、時間區間等條件查詢
+輸出功能	            支援 JSON / CSV 輸出封包內容
+狀態追蹤	            即時撮合價格與數量的狀態更新
+易於擴充與測試	        採用模組化、介面導向設計，可快速支援新格式
 ---
 
 ## 🧩 UML 模組關聯圖（實體圖）
@@ -117,6 +127,37 @@ make
 
 ---
 
-## 📜 授權
+## 👨‍💻 輸出格式
+🖨️ CSV 輸出格式範例
+本專案支援將解析後的封包資料輸出為 .csv 格式，位於 output/ 目錄，方便後續以 Excel、Pandas 等工具分析。以下為各格式輸出範例：
 
-此專案為內部開發用途，可依需求調整授權條款。
+✅ I020 撮合資訊
+time	productId	price	volume
+093001	TXF202405	20500	5
+093002	TXF202405	20525	1
+
+✅ I012 漲跌幅資訊（多階段漲跌停）
+time	productId	limitLevel	limitPrice
+093000	TXF202405	1	21000.00
+093000	TXF202405	2	21500.00
+
+✅ I080 委託簿快照（簡化）
+time	productId	bidPrice1	bidVolume1	askPrice1	askVolume1
+093001	TXF202405	20475	10	20500	12
+
+✅ I010 商品基本資訊
+productId	name	deliveryMonth
+TXF202405	台指期05	202405
+
+📂 檔案輸出位置
+執行主程式後將產生下列檔案於 output/：
+
+lua
+複製
+編輯
+output/
+├── I020.csv
+├── I012.csv
+├── I080.csv
+└── I010.csv
+如需匯出請呼叫 OutputFormatter::exportToCSV(database, "output/")。
