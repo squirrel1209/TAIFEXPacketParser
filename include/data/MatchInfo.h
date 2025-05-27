@@ -30,4 +30,27 @@ struct MatchInfo {
     BCD4 sellCount;               // 累計賣出筆數
 
     BCD1 statusCode;              // 狀態碼（00：正常）
+
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "ProductID: " << prodId.toString()
+            << ", Time: " << matchTime.toString()
+            << ", FirstSign: " << firstSign.toString()
+            << ", FirstPrice: " << firstPrice.toDecimalString(2)
+            << ", FirstQty: " << firstQty.toInt()
+            << ", TotalQty: " << totalQty.toInt()
+            << ", BuyCount: " << buyCount.toInt()
+            << ", SellCount: " << sellCount.toInt()
+            << ", Status: " << statusCode.toString()
+            << ", MatchDetails: [";
+
+        for (const auto& detail : matchList) {
+            oss << detail.sign.toString() << detail.price.toDecimalString(2)
+                << "@" << detail.quantity.toInt() << " ";
+        }
+
+        oss << "]";
+        return oss.str();
+    }
+
 };

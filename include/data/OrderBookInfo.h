@@ -68,6 +68,37 @@ struct OrderBookInfo {
 
     BCD9 derivedSellPrice1;   ///< 衍生賣一價格
     BCD8 derivedSellQty1;     ///< 衍生賣一數量
+
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "ProductID: " << productId.toString() << ", ";
+
+        oss << "BuySide: [";
+        for (int i = 1; i <= 5; ++i) {
+            oss << "B" << i << ": "
+                << (i==1 ? buySign1.toString() + buyPrice1.toDecimalString(2) + "@" + std::to_string(buyQty1.toInt()) :
+                    i==2 ? buySign2.toString() + buyPrice2.toDecimalString(2) + "@" + std::to_string(buyQty2.toInt()) :
+                    i==3 ? buySign3.toString() + buyPrice3.toDecimalString(2) + "@" + std::to_string(buyQty3.toInt()) :
+                    i==4 ? buySign4.toString() + buyPrice4.toDecimalString(2) + "@" + std::to_string(buyQty4.toInt()) :
+                        buySign5.toString() + buyPrice5.toDecimalString(2) + "@" + std::to_string(buyQty5.toInt()))
+                << " ";
+        }
+        oss << "], SellSide: [";
+        for (int i = 1; i <= 5; ++i) {
+            oss << "S" << i << ": "
+                << (i==1 ? sellSign1.toString() + sellPrice1.toDecimalString(2) + "@" + std::to_string(sellQty1.toInt()) :
+                    i==2 ? sellSign2.toString() + sellPrice2.toDecimalString(2) + "@" + std::to_string(sellQty2.toInt()) :
+                    i==3 ? sellSign3.toString() + sellPrice3.toDecimalString(2) + "@" + std::to_string(sellQty3.toInt()) :
+                    i==4 ? sellSign4.toString() + sellPrice4.toDecimalString(2) + "@" + std::to_string(sellQty4.toInt()) :
+                        sellSign5.toString() + sellPrice5.toDecimalString(2) + "@" + std::to_string(sellQty5.toInt()))
+                << " ";
+        }
+        oss << "], DerivedFlag: " << derivedFlag.toInt()
+            << ", DerivedBuy: " << derivedBuyPrice1.toDecimalString(2) << "@" << derivedBuyQty1.toInt()
+            << ", DerivedSell: " << derivedSellPrice1.toDecimalString(2) << "@" << derivedSellQty1.toInt();
+        return oss.str();
+    }
+
 };
 
 #pragma pack(pop)
