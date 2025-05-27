@@ -103,12 +103,12 @@ TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打
 
 ### 對應結構：`MatchInfo`
 
-| 結構欄位     | CSV 欄位     | 型態     | 說明             |
-|--------------|--------------|----------|------------------|
-| `matchTime`  | `time`       | int      | 成交時間         |
-| `productId`  | `productId`  | string   | 商品代碼         |
-| `matchPrice` | `price`      | double   | 成交價格         |
-| `matchVolume`| `volume`     | int      | 成交口數         |
+| CSV 欄位     | 型態     | 說明         | 結構欄位     |
+|--------------|----------|--------------|--------------|
+| `time`       | int      | 成交時間     | `matchTime`  |
+| `productId`  | string   | 商品代碼     | `productId`  |
+| `price`      | double   | 成交價格     | `matchPrice` |
+| `volume`     | int      | 成交口數     | `matchVolume`|
 
 ---
 
@@ -116,30 +116,28 @@ TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打
 
 ### 對應結構：`PriceBandInfo`
 
-| 結構欄位      | CSV 欄位       | 型態   | 說明               |
-|---------------|----------------|--------|--------------------|
-| `productId`   | `productId`    | string | 商品代碼           |
-| `limitLevel`  | `limitLevel`   | int    | 第幾階漲跌停       |
-| `raiseLimit`  | `limitPrice`   | double | 漲停價格（如有）   |
+| CSV 欄位       | 型態   | 說明           | 結構欄位      |
+|----------------|--------|----------------|---------------|
+| `productId`    | string | 商品代碼       | `productId`   |
+| `limitLevel`   | int    | 第幾階漲跌停   | `limitLevel`  |
+| `limitPrice`   | double | 漲停價格（如有）| `raiseLimit`  |
 
-> 備註：若有跌停價格 `fallLimit`，可能另做輸出或合併顯示。
+> 備註：`fallLimit` 可另行輸出或合併顯示
 
 ---
 
-## ✅ I080 委託簿快照（簡化輸出）
+## ✅ I080 委託簿快照（簡化版）
 
 ### 對應結構：`OrderBookInfo`
 
-| 結構欄位         | CSV 欄位         | 型態     | 說明         |
-|------------------|------------------|----------|--------------|
-| `updateTime`     | `time`           | int      | 資料時間     |
-| `productId`      | `productId`      | string   | 商品代碼     |
-| `bidPrice[0]`    | `bidPrice1`      | double   | 第一檔買價   |
-| `bidVolume[0]`   | `bidVolume1`     | int      | 第一檔買量   |
-| `askPrice[0]`    | `askPrice1`      | double   | 第一檔賣價   |
-| `askVolume[0]`   | `askVolume1`     | int      | 第一檔賣量   |
-
-> 備註：簡化版本僅輸出第一檔，完整版本可依需求展開 bid/ask 1~5。
+| CSV 欄位       | 型態     | 說明         | 結構欄位        |
+|----------------|----------|--------------|-----------------|
+| `time`         | int      | 資料時間     | `updateTime`    |
+| `productId`    | string   | 商品代碼     | `productId`     |
+| `bidPrice1`    | double   | 第一檔買價   | `bidPrice[0]`   |
+| `bidVolume1`   | int      | 第一檔買量   | `bidVolume[0]`  |
+| `askPrice1`    | double   | 第一檔賣價   | `askPrice[0]`   |
+| `askVolume1`   | int      | 第一檔賣量   | `askVolume[0]`  |
 
 ---
 
@@ -147,11 +145,11 @@ TAIFEXPacketProject 是一個專為台灣期交所（TAIFEX）封包格式所打
 
 ### 對應結構：`ProductInfo`
 
-| 結構欄位        | CSV 欄位        | 型態       | 說明         |
-|-----------------|-----------------|------------|--------------|
-| `productId`     | `productId`     | string     | 商品代碼     |
-| `productName`   | `name`          | string     | 商品名稱     |
-| `deliveryMonth` | `deliveryMonth` | string/int | 交割月份     |
+| CSV 欄位        | 型態       | 說明       | 結構欄位        |
+|-----------------|------------|------------|-----------------|
+| `productId`     | string     | 商品代碼   | `productId`     |
+| `name`          | string     | 商品名稱   | `productName`   |
+| `deliveryMonth` | string/int | 交割月份   | `deliveryMonth` |
 
 ---
 
