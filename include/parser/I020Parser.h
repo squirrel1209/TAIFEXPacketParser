@@ -1,7 +1,15 @@
 #pragma once
-#include "data/MatchInfo.h"
 
-class I020Parser {
+#include "base/TAIFEXParserInterface.h"
+#include "data/MatchInfo.h"
+#include <memory>
+
+/// ========================================
+/// 🧩 I020Parser：撮合成交資訊解析器
+/// - 繼承 TAIFEXParserInterface
+/// - 回傳多型指標 ParsedResultBase
+/// ========================================
+class I020Parser : public TAIFEXParserInterface {
 public:
-    MatchInfo parseBody(const uint8_t* ptr, std::size_t length);
+    std::shared_ptr<ParsedResultBase> parse(const std::vector<uint8_t>& body) override;
 };
