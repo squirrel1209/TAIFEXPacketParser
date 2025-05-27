@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <cstring>
+#include <algorithm>
 
 
 // ===============================
@@ -39,8 +40,11 @@ public:
     /// 僅當 T 為 char 時，將內容轉成 std::string（最多長度 N）
     std::string toString() const {
         static_assert(std::is_same<T, char>::value, "toString() only available for FixedArray<char, N>");
-        return std::string(arr, strnlen(arr, N));
+        std::string s(arr, strnlen(arr, N));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char c) { return c != '\0' && c != ' '; }).base(), s.end());
+        return s;
     }
+
 
 
     /// 回傳唯讀的資料指標

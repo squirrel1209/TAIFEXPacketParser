@@ -15,13 +15,10 @@ std::shared_ptr<ParsedResultBase> PacketDispatcher::dispatch(
     const uint8_t* bodyPtr,
     std::size_t bodyLen
 ) {
-    // 將原始 body bytes 包裝為 vector<uint8_t>，方便傳給 Parser 使用
-    std::vector<uint8_t> body(bodyPtr, bodyPtr + bodyLen);
-
     // 從 header 取出 messageKind 欄位（格式代號）
     const std::string kindStr = header.messageKind.toString();
 
-    // 🛡️ 防呆檢查
+    // 🛡️ 防呆檢查 1️⃣：messageKind 空字串
     if (kindStr.empty()) {
         std::cerr << "⚠️ messageKind 空字串，跳過封包！\n";
         return nullptr;
@@ -31,8 +28,11 @@ std::shared_ptr<ParsedResultBase> PacketDispatcher::dispatch(
     const char kind = kindStr[0];
 
     // 🔎 Debug 輸出
-    std::cerr << "🔎 Raw messageKind = [" << kind << "] (Hex = 0x" 
-              << std::hex << static_cast<int>(kind) << ")\n";
+    //std::cerr << "🔎 Raw messageKind = [" << kind << "] (Hex = 0x" 
+    //          << std::hex << static_cast<int>(kind) << ")\n";
+
+    // 將原始 body bytes 包裝為 vector<uint8_t>，方便傳給 Parser 使用
+    std::vector<uint8_t> body(bodyPtr, bodyPtr + bodyLen);
 
     try {
         // === I010Parser: 商品基本資料 ===

@@ -5,7 +5,7 @@
 /// 新增解析後的封包到資料庫
 void TAIFEXMemoryDatabase::add(const std::shared_ptr<ParsedResultBase>& result) {
     const std::string formatName = result->getFormatName();
-    std::cout << "✅ add() 收到封包 FormatName: " << formatName << std::endl;
+    //std::cout << "✅ add() 收到封包 FormatName: " << formatName << std::endl;
 
     if (formatName == "I020") {
         auto ptr = std::dynamic_pointer_cast<ParsedResultBaseImpl<MatchInfo>>(result);
@@ -44,7 +44,7 @@ void TAIFEXMemoryDatabase::add(const std::shared_ptr<ParsedResultBase>& result) 
         productInfoMap[ptr->getData().productId.toString()] = ptr->getData();
     } 
     else {
-        std::cerr << "⚠️ 無法識別的 FormatName: " << formatName << std::endl;
+        //std::cerr << "⚠️ 無法識別的 FormatName: " << formatName << std::endl;
     }
 }
 
