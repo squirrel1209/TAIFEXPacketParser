@@ -10,11 +10,9 @@ class I020Packet : public ParsedResultBase {
 public:
     I020Packet(const CommonHeader& h, const MatchInfo& m);
 
-    // 封包類型名稱
-    std::string getFormatName() const override;
+    std::string getFormatName() const override { return "I020"; }
 
-    // 輸出為字串（簡易）
-    std::string toString() const override;
+    std::string toString() const override { return "I020Packet: " + body.prodId.toString(); }
 
     const CommonHeader header;
     const MatchInfo body;

@@ -4,48 +4,38 @@
 #include <vector>
 #include <memory>
 #include <string>
+
 #include "base/ParsedResultBase.h"
 #include "data/MatchInfo.h"
-#include "data/ProductInfo.h"
 #include "data/PriceBandInfo.h"
 #include "data/OrderBookInfo.h"
+#include "data/ProductInfo.h"
+#include "data/I020Packet.h"
+#include "data/I012Packet.h"
+#include "data/I080Packet.h"
+#include "data/I010Packet.h"
 
-/// ============================================================
-/// 🏦 TAIFEXMemoryDatabase：記憶體內資料庫
-/// - 儲存各格式封包資料（I010, I012, I020, I080）
-/// - 提供快速查詢、後續統計與輸出
-/// - 使用 unordered_map 依商品代碼分類存放
-/// ============================================================
+/// ===========================================
+/// 📦 TAIFEXMemoryDatabase
+/// 將解析後的封包資料，依格式儲存到對應的 map
+/// ===========================================
 class TAIFEXMemoryDatabase {
 public:
-    /// 新增封包結果（自動辨識格式，加入對應資料表）
+    /// 將解析結果加入資料庫
     void add(const std::shared_ptr<ParsedResultBase>& result);
 
-    /// 查詢指定商品的撮合成交紀錄（I020）
-    const std::vector<MatchInfo>& getDealsByCode(const std::string& code) const;
-
-    /// 查詢指定商品的基本資料（I010）
-    const ProductInfo* getProductByCode(const std::string& code) const;
-
-    /// 查詢指定商品的漲跌幅階段資訊（I012）
-    const std::vector<PriceBandInfo>& getPriceBandsByCode(const std::string& code) const;
-
-    /// 查詢指定商品的委託簿快照（I080）
-    const std::vector<OrderBookInfo>& getOrderBooksByCode(const std::string& code) const;
-
-    /// 輸出所有資料內容（for debug）
+    /// 輸出簡單的資料統計（for Debug）
     void dump() const;
 
+    /// 封包資料查詢接口（回傳 const 參考）
+    const std::unordered_map<std::string, std::vector<MatchInfo>>& getAllMatchInfo() const { return matchInfoMap; }
+    const std::unordered_map<std::string, std::vector<PriceBandInfo>>& getAllPriceBandInfo() const { return priceBandMap; }
+    const std::unordered_map<std::string, std::vector<OrderBookInfo>>& getAllOrderBookInfo() const { return orderBookMap; }
+    const std::unordered_map<std::string, ProductInfo>& getAllProductInfo() const { return productInfoMap; }
+
 private:
-    /// 撮合成交資料表（I020）：key = 商品代碼，value = 多筆成交紀錄
-    std::unordered_map<std::string, std::vector<MatchInfo>> dealMap;
-
-    /// 商品基本資料表（I010）：key = 商品代碼，value = 單筆商品資料
-    std::unordered_map<std::string, ProductInfo> productMap;
-
-    /// 漲跌幅階段資料表（I012）：key = 商品代碼，value = 多筆時間序列
-    std::unordered_map<std::string, std::vector<PriceBandInfo>> priceBandMap;
-
-    /// 委託簿快照資料表（I080）：key = 商品代碼，value = 多筆時間序列
-    std::unordered_map<std::string, std::vector<OrderBookInfo>> orderBookMap;
+    std::unordered_map<std::string, std::vector<MatchInfo>> matchInfoMap;     ///< I020 對應資料
+    std::unordered_map<std::string, std::vector<PriceBandInfo>> priceBandMap; ///< I012 對應資料
+    std::unordered_map<std::string, std::vector<OrderBookInfo>> orderBookMap; ///< I080 對應資料
+    std::unordered_map<std::string, ProductInfo> productInfoMap;              ///< I010 對應資料
 };

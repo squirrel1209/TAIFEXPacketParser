@@ -30,4 +30,10 @@ public:
     std::string toString() const override {
         return data.toString();
     }
+
+    /// ⭐ 回傳封包資料本體
+    /// - 提供給 MemoryDatabase 存取封包資料
+    T getData() const {
+        return data;
+    }
 };

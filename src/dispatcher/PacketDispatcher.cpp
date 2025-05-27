@@ -21,6 +21,11 @@ std::shared_ptr<ParsedResultBase> PacketDispatcher::dispatch(
     // 從 header 取出 messageKind 欄位（格式代號）
     const std::string kind = header.messageKind.toString();
 
+    std::cerr << "🔎 Raw messageKind = [" << header.messageKind.toString() 
+            << "] (Hex = 0x" << std::hex << static_cast<int>(header.messageKind[0]) << ")\n";
+
+
+
     try {
         // === I010Parser: 商品基本資料 ===
         // 根據 TAIFEX 規範，I010 對應 messageKind == "1"
