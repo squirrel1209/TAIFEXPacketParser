@@ -15,5 +15,5 @@ std::shared_ptr<ParsedResultBase> I010Parser::parse(const std::vector<uint8_t>& 
     std::memcpy(&info, body.data(), sizeof(ProductInfo));
 
     // ✅ 包裝為泛型解析結果
-    return std::make_shared<ParsedResultBaseImpl<ProductInfo>>(info);
+    return std::make_shared<ParsedResultBaseImpl<ProductInfo>>(info, "I010");
 }

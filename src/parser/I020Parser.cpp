@@ -46,5 +46,5 @@ std::shared_ptr<ParsedResultBase> I020Parser::parse(const std::vector<uint8_t>& 
     info.statusCode.data()[0] = *ptr++;
 
     // 8️⃣ 包裝回傳
-    return std::make_shared<ParsedResultBaseImpl<MatchInfo>>(info);
+    return std::make_shared<ParsedResultBaseImpl<MatchInfo>>(info, "I020");
 }

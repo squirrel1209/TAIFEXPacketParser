@@ -85,3 +85,6 @@ typedef TBCD<3> BCD3;
 typedef TBCD<4> BCD4;
 typedef TBCD<5> BCD5;
 typedef TBCD<6> BCD6;
+typedef TBCD<8> BCD8;
+typedef TBCD<9> BCD9;
+

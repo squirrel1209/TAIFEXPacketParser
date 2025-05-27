@@ -56,5 +56,5 @@ std::shared_ptr<ParsedResultBase> I012Parser::parse(const std::vector<uint8_t>& 
     }
 
     // ✅ 回傳泛型解析結果
-    return std::make_shared<ParsedResultBaseImpl<PriceBandInfo>>(info);
+    return std::make_shared<ParsedResultBaseImpl<PriceBandInfo>>(info, "I012");
 }
