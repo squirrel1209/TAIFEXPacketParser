@@ -42,6 +42,7 @@ public:
         return std::string(arr, strnlen(arr, N));
     }
 
+
     /// 回傳唯讀的資料指標
     const T* data() const;
 };

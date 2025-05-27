@@ -1,98 +1,130 @@
-#include "controller/TAIFEXPacketParser.h"
-#include "storage/TAIFEXMemoryDatabase.h"
+// main.cpp
 #include <fstream>
 #include <vector>
+#include <cstdint>
 #include <iostream>
+#include <thread>
+#include <iomanip>
+#include <filesystem>  // C++17 for std::filesystem
 
-int main() {
-    // ================================================
-    // 1️⃣ 載入封包檔案（請將測試檔放在 ./data 目錄下）
-    // ================================================
-    std::ifstream file("../data/Opt.bin", std::ios::binary); // 📝 可修改檔案名稱
+#include "controller/TAIFEXPacketParser.h"
+#include "storage/TAIFEXMemoryDatabase.h"
+
+// =============================================
+// 🔸 儲存資料庫內容到多個 CSV 檔
+// =============================================
+void saveToCSV(const TAIFEXMemoryDatabase& db, const std::string& prefix) {
+    // ===== 1️⃣ I020 撮合成交資訊 =====
+    {
+        std::ofstream ofs(prefix + "_I020.csv");
+        ofs << "productId,time,price,volume\n";
+        for (const auto& [productId, matchList] : db.matchInfoMap) {
+            for (const auto& match : matchList) {
+                ofs << match.prodId.toString() << ","
+                    << match.matchTime.toInt() << ","
+                    << match.firstPrice.toDecimalString(2) << ","
+                    << match.firstQty.toInt() << "\n";
+            }
+        }
+        ofs.close();
+    }
+
+    // ===== 2️⃣ I012 漲跌幅資訊 =====
+    {
+        std::ofstream ofs(prefix + "_I012.csv");
+        ofs << "productId,level,type,price\n";
+        for (const auto& [productId, bandList] : db.priceBandMap) {
+            for (const auto& band : bandList) {
+                for (const auto& r : band.raiseLimitList) {
+                    ofs << band.productId.toString() << ","
+                        << int(r.level.toInt()) << ","
+                        << "raise" << ","
+                        << r.price.toDecimalString(2) << "\n";
+                }
+                for (const auto& f : band.fallLimitList) {
+                    ofs << band.productId.toString() << ","
+                        << int(f.level.toInt()) << ","
+                        << "fall" << ","
+                        << f.price.toDecimalString(2) << "\n";
+                }
+            }
+        }
+        ofs.close();
+    }
+
+    // ===== 3️⃣ I080 五檔委託簿資訊 =====
+    {
+        std::ofstream ofs(prefix + "_I080.csv");
+        ofs << "productId,bidPrice1,bidQty1,askPrice1,askQty1\n";
+        for (const auto& [productId, orderList] : db.orderBookMap) {
+            for (const auto& order : orderList) {
+                ofs << order.productId.toString() << ","
+                    << order.buyPrice1.toDecimalString(2) << ","
+                    << order.buyQty1.toInt() << ","
+                    << order.sellPrice1.toDecimalString(2) << ","
+                    << order.sellQty1.toInt() << "\n";
+            }
+        }
+        ofs.close();
+    }
+
+    // ===== 4️⃣ I010 商品基本資料 =====
+    {
+        std::ofstream ofs(prefix + "_I010.csv");
+        ofs << "productId,referencePrice,deliveryDate\n";
+        for (const auto& [productId, prod] : db.productInfoMap) {
+            ofs << prod.productId.toString() << ","
+                << prod.referencePrice.toDecimalString(prod.decimalLocator.toInt()) << ","
+                << prod.deliveryDate.toString() << "\n";
+        }
+        ofs.close();
+    }
+
+    std::cout << "[" << prefix << "] ✅ 所有 CSV 檔案已完成輸出！\n";
+}
+
+// =============================================
+// 🔸 處理單一檔案（讀取 → 解析 → 存入資料庫 → 輸出 CSV）
+// =============================================
+void processFile(const std::string& filePath, const std::string& prefix) {
+    std::cout << "[" << prefix << "] 🔍 嘗試打開檔案：" << filePath << std::endl;
+    std::cout << "[" << prefix << "] 📂 當前工作目錄：" << std::filesystem::current_path() << std::endl;
+
+    std::ifstream file(filePath, std::ios::binary);
     if (!file) {
-        std::cerr << "❌ 無法開啟封包檔案！請確認路徑與檔名是否正確。\n";
-        return 1;
+        std::cerr << "[" << prefix << "] ❌ 無法開啟檔案：" << filePath << "\n";
+        return;
     }
 
     std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(file), {});
-    std::cout << "✅ 封包檔案讀取完成，大小：" << buffer.size() << " bytes\n";
+    std::cout << "[" << prefix << "] ✅ 檔案讀取完成，大小：" << buffer.size() << " bytes\n";
 
-    // ================================================
-    // 2️⃣ 初始化封包解析器並執行解析流程
-    // ================================================
     TAIFEXPacketParser parser(buffer);
     parser.parseAll();
 
-    // ================================================
-    // 3️⃣ 建立記憶體資料庫，存入所有解析結果
-    // ================================================
     TAIFEXMemoryDatabase db;
     for (const auto& result : parser.getResults()) {
         db.add(result);
     }
 
+    std::cout << "[" << prefix << "] 📊 資料庫內容如下：\n";
     db.dump();
-    std::cout << "✅ 封包解析與資料儲存流程結束。\n";
-    std::cout << "=========================================\n";
 
-    // ================================================
-    // 4️⃣ 輸出 4 個格式的 .csv 檔案
-    // ================================================
+    saveToCSV(db, prefix);
+}
 
-    // ====== I020.csv: 撮合成交資料 ======
-    std::ofstream i020File("I020.csv");
-    i020File << "time,productId,price,volume\n";
-    for (const auto& [productId, deals] : db.getAllMatchInfo()) {
-        for (const auto& deal : deals) {
-            i020File << deal.matchTime.toInt() << ","
-                     << deal.prodId.toString() << ","
-                     << deal.firstPrice.toDecimalString(2) << ","
-                     << deal.firstQty.toInt() << "\n";
-        }
-    }
-    i020File.close();
-    std::cout << "✅ I020.csv 輸出完成！\n";
+// =============================================
+// 🔸 主程式入口
+// =============================================
+int main() {
+    std::cout << "🎬 開始處理檔案...\n";
 
-    // ====== I012.csv: 漲跌幅資料 ======
-    std::ofstream i012File("I012.csv");
-    i012File << "productId,limitLevel,limitPrice\n";
-    for (const auto& [productId, bands] : db.getAllPriceBandInfo()) {
-        for (const auto& band : bands) {
-            for (const auto& r : band.raiseLimitList) {
-                i012File << band.productId.toString() << ","
-                         << r.level.toInt() << ","
-                         << r.price.toDecimalString(2) << "\n";
-            }
-            // 若需要跌停價，可在這裡加 band.fallLimitList 處理
-        }
-    }
-    i012File.close();
-    std::cout << "✅ I012.csv 輸出完成！\n";
+    std::thread futThread(processFile, std::string("../data/Fut.bin"), std::string("Fut"));
+    std::thread optThread(processFile, std::string("../data/Opt.bin"), std::string("Opt"));
 
-    // ====== I080.csv: 委託簿資料 ======
-    std::ofstream i080File("I080.csv");
-    i080File << "productId,bidPrice1,bidVolume1,askPrice1,askVolume1\n";
-    for (const auto& [productId, orders] : db.getAllOrderBookInfo()) {
-        for (const auto& ob : orders) {
-            i080File << ob.productId.toString() << ","
-                     << ob.buyPrice1.toDecimalString(2) << ","
-                     << ob.buyQty1.toInt() << ","
-                     << ob.sellPrice1.toDecimalString(2) << ","
-                     << ob.sellQty1.toInt() << "\n";
-        }
-    }
-    i080File.close();
-    std::cout << "✅ I080.csv 輸出完成！\n";
+    futThread.join();
+    optThread.join();
 
-    // ====== I010.csv: 商品基本資料 ======
-    std::ofstream i010File("I010.csv");
-    i010File << "productId,deliveryDate\n";
-    for (const auto& [productId, info] : db.getAllProductInfo()) {
-        i010File << info.productId.toString() << ","
-                 << info.deliveryDate.toString() << "\n";
-    }
-    i010File.close();
-    std::cout << "✅ I010.csv 輸出完成！\n";
-
+    std::cout << "🎉 所有檔案處理完成！\n";
     return 0;
 }

@@ -10,37 +10,37 @@ void TAIFEXMemoryDatabase::add(const std::shared_ptr<ParsedResultBase>& result) 
     if (formatName == "I020") {
         auto ptr = std::dynamic_pointer_cast<ParsedResultBaseImpl<MatchInfo>>(result);
         if (!ptr) {
-            std::cerr << "❌ dynamic_pointer_cast<I020> 失敗！" << std::endl;
+            //std::cerr << "❌ dynamic_pointer_cast<I020> 失敗！" << std::endl;
             return;
         }
-        std::cout << "✅ I020 productId = [" << ptr->getData().prodId.toString() << "]" << std::endl;
+        //std::cout << "✅ I020 productId = [" << ptr->getData().prodId.toString() << "]" << std::endl;
         matchInfoMap[ptr->getData().prodId.toString()].push_back(ptr->getData());
     } 
     else if (formatName == "I012") {
         auto ptr = std::dynamic_pointer_cast<ParsedResultBaseImpl<PriceBandInfo>>(result);
         if (!ptr) {
-            std::cerr << "❌ dynamic_pointer_cast<I012> 失敗！" << std::endl;
+            //std::cerr << "❌ dynamic_pointer_cast<I012> 失敗！" << std::endl;
             return;
         }
-        std::cout << "✅ I012 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
+        //std::cout << "✅ I012 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
         priceBandMap[ptr->getData().productId.toString()].push_back(ptr->getData());
     } 
     else if (formatName == "I080") {
         auto ptr = std::dynamic_pointer_cast<ParsedResultBaseImpl<OrderBookInfo>>(result);
         if (!ptr) {
-            std::cerr << "❌ dynamic_pointer_cast<I080> 失敗！" << std::endl;
+            //std::cerr << "❌ dynamic_pointer_cast<I080> 失敗！" << std::endl;
             return;
         }
-        std::cout << "✅ I080 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
+        //std::cout << "✅ I080 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
         orderBookMap[ptr->getData().productId.toString()].push_back(ptr->getData());
     } 
     else if (formatName == "I010") {
         auto ptr = std::dynamic_pointer_cast<ParsedResultBaseImpl<ProductInfo>>(result);
         if (!ptr) {
-            std::cerr << "❌ dynamic_pointer_cast<I010> 失敗！" << std::endl;
+            //std::cerr << "❌ dynamic_pointer_cast<I010> 失敗！" << std::endl;
             return;
         }
-        std::cout << "✅ I010 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
+        //std::cout << "✅ I010 productId = [" << ptr->getData().productId.toString() << "]" << std::endl;
         productInfoMap[ptr->getData().productId.toString()] = ptr->getData();
     } 
     else {

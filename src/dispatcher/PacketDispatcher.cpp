@@ -19,51 +19,50 @@ std::shared_ptr<ParsedResultBase> PacketDispatcher::dispatch(
     std::vector<uint8_t> body(bodyPtr, bodyPtr + bodyLen);
 
     // 從 header 取出 messageKind 欄位（格式代號）
-    const std::string kind = header.messageKind.toString();
+    const std::string kindStr = header.messageKind.toString();
 
-    std::cerr << "🔎 Raw messageKind = [" << header.messageKind.toString() 
-            << "] (Hex = 0x" << std::hex << static_cast<int>(header.messageKind[0]) << ")\n";
+    // 🛡️ 防呆檢查
+    if (kindStr.empty()) {
+        std::cerr << "⚠️ messageKind 空字串，跳過封包！\n";
+        return nullptr;
+    }
 
+    // 取出單一字元作為代碼
+    const char kind = kindStr[0];
 
+    // 🔎 Debug 輸出
+    std::cerr << "🔎 Raw messageKind = [" << kind << "] (Hex = 0x" 
+              << std::hex << static_cast<int>(kind) << ")\n";
 
     try {
         // === I010Parser: 商品基本資料 ===
-        // 根據 TAIFEX 規範，I010 對應 messageKind == "1"
-        if (kind == "1") {
+        if (kind == '1') {
             I010Parser parser;
             return parser.parse(body);
         }
-        
         // === I012Parser: 漲跌幅限制資訊 ===
-        // I012 對應 messageKind == "A"
-        else if (kind == "A") {
+        else if (kind == 'A') {
             I012Parser parser;
             return parser.parse(body);
         }
-
         // === I080Parser: 委託簿快照 ===
-        // I080 對應 messageKind == "2"
-        else if (kind == "2") {
+        else if (kind == '2') {
             I080Parser parser;
             return parser.parse(body);
         }
-
         // === I020Parser: 撮合成交資訊 ===
-        // I020 對應 messageKind == "0"
-        else if (kind == "0") { // I020
+        else if (kind == '0') {
             I020Parser parser;
             return parser.parse(body);
         }
-
         // === 無對應格式 ===
         else {
-            std::cerr << "⚠️ 未知封包格式，無法解析，messageKind = " << kind << "\n";
+            std::cerr << "⚠️ 未知封包格式，無法解析，messageKind = [" << kind << "]\n";
             return nullptr;
         }
     }
     catch (const std::exception& e) {
-        // 捕獲解析過程中的錯誤，並印出錯誤訊息
-        std::cerr << "❌ PacketDispatcher 解析失敗 (" << kind << "): " << e.what() << "\n";
+        std::cerr << "❌ PacketDispatcher 解析失敗 (messageKind = " << kind << "): " << e.what() << "\n";
         return nullptr;
     }
 }

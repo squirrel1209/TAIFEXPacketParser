@@ -20,6 +20,8 @@
 /// 將解析後的封包資料，依格式儲存到對應的 map
 /// ===========================================
 class TAIFEXMemoryDatabase {
+    friend void saveToCSV(const TAIFEXMemoryDatabase& db, const std::string& prefix);
+    
 public:
     /// 將解析結果加入資料庫
     void add(const std::shared_ptr<ParsedResultBase>& result);
