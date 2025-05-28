@@ -32,7 +32,7 @@ file(GLOB_RECURSE STATE_SRC      src/state/*.cpp)       # 狀態追蹤模組
 file(GLOB_RECURSE COMMON_SRC     src/common/*.cpp)      # BCD/FixedArray 工具類別
 
 # ✅ 主程式進入點
-set(MAIN_SRC src/main.cpp)
+set(MAIN_SRC main.cpp)
 
 # ✅ 建立執行檔
 add_executable(TAIFEXMain
