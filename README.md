@@ -179,10 +179,10 @@ OutputFormatter::exportToCSV(database, "output/");
 
 ```
 TAIFEXPacketProject/
-├── data/                       # 📂 測試用二進位封包檔 (如 Fut.bin / Opt.bin)
-├── doc/                        # 📂 專案文件與圖表資料
-│   ├── 資料處理流程圖.txt       # 處理流程文字說明
-│   ├── 系統物件關係.txt         # 系統關聯關係說明
+├── data/                        # 📂 測試用二進位封包檔 (如 Fut.bin / Opt.bin)
+├── doc/                         # 📂 專案文件與圖表資料
+│   ├── ProcessFlow.puml        # 處理流程文字說明
+│   ├── SystemDiagram.puml       # 系統關聯關係說明
 │   ├── data_flowchart.png       # 資料處理流程圖
 │   ├── system_diagram.png       # 系統架構圖
 │   ├── 多執行緒.png            # 多執行緒說明圖
