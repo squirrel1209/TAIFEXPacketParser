@@ -1,3 +1,0 @@
-C:/Users/squirrel/Desktop/Kway/TAIFEXPacketParser/build/CMakeFiles/TAIFEXMain.dir
-C:/Users/squirrel/Desktop/Kway/TAIFEXPacketParser/build/CMakeFiles/edit_cache.dir
-C:/Users/squirrel/Desktop/Kway/TAIFEXPacketParser/build/CMakeFiles/rebuild_cache.dir

@@ -194,7 +194,6 @@ TAIFEXPacketProject/
 │   ├── controller/             # 主解析流程控制
 │   ├── data/                   # 封包資料結構 (Header + Body)
 │   ├── dispatcher/             # 封包分發邏輯
-│   ├── output/                 # 結果輸出 (JSON / CSV)
 │   ├── parser/                 # 各格式 payload 解析器
 │   ├── protocol/               # 封包通用欄位 (Header)
 │   └── storage/                # 記憶體內資料庫

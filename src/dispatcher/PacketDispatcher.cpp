@@ -1,68 +1,50 @@
-// PacketDispatcher.cpp
 #include "dispatcher/PacketDispatcher.h"
 #include "parser/I010Parser.h"
 #include "parser/I012Parser.h"
 #include "parser/I020Parser.h"
 #include "parser/I080Parser.h"
-#include "result/ParsedResultBaseImpl.hpp"
-#include <stdexcept>
 #include <iostream>
+#include <unordered_map>
+#include <functional>
 
-// ✅ 封包分派邏輯實作
-// 功能：根據 header 的 messageKind，決定使用哪個解析器處理封包
+/// === Parser 註冊表（定義每種 Parser 的工廠函式） ===
+using ParserFactory = std::function<std::shared_ptr<ParsedResultBase>(const std::vector<uint8_t>&)>;
+
+static const std::unordered_map<char, ParserFactory> parserMap = {
+    { '1', [](const std::vector<uint8_t>& body) { I010Parser p; return p.parse(body); } },
+    { 'A', [](const std::vector<uint8_t>& body) { I012Parser p; return p.parse(body); } },
+    { '0', [](const std::vector<uint8_t>& body) { I020Parser p; return p.parse(body); } },
+    { '2', [](const std::vector<uint8_t>& body) { I080Parser p; return p.parse(body); } }
+};
+
 std::shared_ptr<ParsedResultBase> PacketDispatcher::dispatch(
     const CommonHeader& header,
     const uint8_t* bodyPtr,
     std::size_t bodyLen
 ) {
-    // 從 header 取出 messageKind 欄位（格式代號）
+    // 取出 messageKind 字元
     const std::string kindStr = header.messageKind.toString();
-
-    // 🛡️ 防呆檢查 1️⃣：messageKind 空字串
     if (kindStr.empty()) {
         std::cerr << "⚠️ messageKind 空字串，跳過封包！\n";
         return nullptr;
     }
-
-    // 取出單一字元作為代碼
     const char kind = kindStr[0];
 
-    // 🔎 Debug 輸出
-    //std::cerr << "🔎 Raw messageKind = [" << kind << "] (Hex = 0x" 
-    //          << std::hex << static_cast<int>(kind) << ")\n";
-
-    // 將原始 body bytes 包裝為 vector<uint8_t>，方便傳給 Parser 使用
+    // 將 body bytes 包裝為 vector<uint8_t>
     std::vector<uint8_t> body(bodyPtr, bodyPtr + bodyLen);
 
-    try {
-        // === I010Parser: 商品基本資料 ===
-        if (kind == '1') {
-            I010Parser parser;
-            return parser.parse(body);
-        }
-        // === I012Parser: 漲跌幅限制資訊 ===
-        else if (kind == 'A') {
-            I012Parser parser;
-            return parser.parse(body);
-        }
-        // === I080Parser: 委託簿快照 ===
-        else if (kind == '2') {
-            I080Parser parser;
-            return parser.parse(body);
-        }
-        // === I020Parser: 撮合成交資訊 ===
-        else if (kind == '0') {
-            I020Parser parser;
-            return parser.parse(body);
-        }
-        // === 無對應格式 ===
-        else {
-            std::cerr << "⚠️ 未知封包格式，無法解析，messageKind = [" << kind << "]\n";
+    // 查找對應 Parser
+    auto it = parserMap.find(kind);
+    if (it != parserMap.end()) {
+        try {
+            return it->second(body);
+        } catch (const std::exception& e) {
+            std::cerr << "❌ 解析失敗 (messageKind = " << kind << "): " << e.what() << "\n";
             return nullptr;
         }
     }
-    catch (const std::exception& e) {
-        std::cerr << "❌ PacketDispatcher 解析失敗 (messageKind = " << kind << "): " << e.what() << "\n";
-        return nullptr;
-    }
+
+    // 沒找到對應 Parser
+    std::cerr << "⚠️ 未知封包格式，無法解析，messageKind = [" << kind << "]\n";
+    return nullptr;
 }
